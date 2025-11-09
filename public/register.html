@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container register-container">
+    <h1>Create Account</h1>
+
+    <!-- Back button -->
+    <button id="backBtn">⬅ Back</button>
+
+    <form id="registerForm">
+      <input type="text" id="username" placeholder="Username" required>
+      <input type="email" id="email" placeholder="Email" required>
+      <input type="password" id="password" placeholder="Password" required>
+      <input type="password" id="confirmPassword" placeholder="Confirm Password" required>
+      
+      <button type="submit">Register</button>
+    </form>
+
+    <p>Already have an account? <a href="index.html">Login</a></p>
+  </div>
+
+  <script>
+    const form = document.getElementById('registerForm');
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const username = document.getElementById('username').value;
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+
+      if(password !== confirmPassword){
+        alert("Passwords do not match!");
+        return;
+      }
+
+      const user = { username, email, password };
+      localStorage.setItem('user', JSON.stringify(user));
+      alert("Registration successful!");
+      window.location.href = "index.html";
+    });
+
+    document.getElementById('backBtn').addEventListener('click', () => {
+      window.location.href = "index.html";
+    });
+  </script>
+</body>
+</html>
+

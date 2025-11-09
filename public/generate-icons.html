@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generate App Icons</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f5f5f5;
+      text-align: center;
+    }
+    .instructions {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      max-width: 800px;
+      margin: 0 auto;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    h1 { color: #2575fc; }
+    .icon-preview {
+      margin: 20px 0;
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    canvas {
+      border: 2px solid #ddd;
+      border-radius: 10px;
+    }
+    button {
+      background: #2575fc;
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      margin: 10px;
+    }
+    button:hover {
+      background: #1a5fcc;
+    }
+    .step {
+      background: #f0f8ff;
+      padding: 15px;
+      margin: 15px 0;
+      border-left: 4px solid #2575fc;
+      text-align: left;
+    }
+    code {
+      background: #f5f5f5;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: monospace;
+    }
+  </style>
+</head>
+<body>
+  <div class="instructions">
+    <h1>⏱️ Generate App Icons</h1>
+    <p>This tool generates simple placeholder icons for your PWA. For production, create custom icons with your logo!</p>
+    
+    <button onclick="generateAllIcons()">🎨 Generate All Icons</button>
+    
+    <div class="icon-preview" id="iconPreview"></div>
+    
+    <div class="step">
+      <h3>Option 1: Use Generated Icons (Quick)</h3>
+      <ol>
+        <li>Click "Generate All Icons" button above</li>
+        <li>Right-click each icon and "Save image as..."</li>
+        <li>Save with exact names: <code>icon-72x72.png</code>, <code>icon-96x96.png</code>, etc.</li>
+        <li>Place all icons in the <code>public/</code> folder</li>
+      </ol>
+    </div>
+    
+    <div class="step">
+      <h3>Option 2: Create Custom Icons (Recommended)</h3>
+      <p>Create professional icons with these tools:</p>
+      <ul>
+        <li><strong>Figma/Canva</strong>: Design a 512x512px icon</li>
+        <li><strong>Online Tool</strong>: <a href="https://realfavicongenerator.net/" target="_blank">RealFaviconGenerator.net</a></li>
+        <li><strong>PWA Asset Generator</strong>: <a href="https://www.pwabuilder.com/imageGenerator" target="_blank">PWABuilder Image Generator</a></li>
+      </ul>
+      <p><strong>Design Tips:</strong></p>
+      <ul>
+        <li>Use a simple, recognizable symbol (⏱️ stopwatch icon)</li>
+        <li>High contrast colors</li>
+        <li>No text (icons are small)</li>
+        <li>Square format (will be rounded by OS)</li>
+      </ul>
+    </div>
+    
+    <div class="step">
+      <h3>Required Icon Sizes</h3>
+      <ul>
+        <li><code>icon-72x72.png</code> - iOS</li>
+        <li><code>icon-96x96.png</code> - Android</li>
+        <li><code>icon-128x128.png</code> - Chrome Web Store</li>
+        <li><code>icon-144x144.png</code> - Windows</li>
+        <li><code>icon-152x152.png</code> - iOS</li>
+        <li><code>icon-192x192.png</code> - Android (required)</li>
+        <li><code>icon-384x384.png</code> - Splash screen</li>
+        <li><code>icon-512x512.png</code> - High-res (required)</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    const sizes = [72, 96, 128, 144, 152, 192, 384, 512];
+    
+    function generateIcon(size) {
+      const canvas = document.createElement('canvas');
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext('2d');
+      
+      // Background gradient
+      const gradient = ctx.createLinearGradient(0, 0, size, size);
+      gradient.addColorStop(0, '#2575fc');
+      gradient.addColorStop(1, '#6a11cb');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, size, size);
+      
+      // Draw stopwatch icon
+      const centerX = size / 2;
+      const centerY = size / 2;
+      const radius = size * 0.35;
+      
+      // Outer circle (white)
+      ctx.strokeStyle = 'white';
+      ctx.lineWidth = size * 0.08;
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+      ctx.stroke();
+      
+      // Center dot
+      ctx.fillStyle = 'white';
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, size * 0.05, 0, 2 * Math.PI);
+      ctx.fill();
+      
+      // Hour hand
+      ctx.strokeStyle = 'white';
+      ctx.lineWidth = size * 0.05;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(centerX, centerY);
+      ctx.lineTo(centerX, centerY - radius * 0.5);
+      ctx.stroke();
+      
+      // Minute hand
+      ctx.strokeStyle = 'white';
+      ctx.lineWidth = size * 0.04;
+      ctx.beginPath();
+      ctx.moveTo(centerX, centerY);
+      ctx.lineTo(centerX + radius * 0.6, centerY);
+      ctx.stroke();
+      
+      // Top button
+      ctx.fillStyle = 'white';
+      ctx.fillRect(centerX - size * 0.05, centerY - radius - size * 0.15, size * 0.1, size * 0.1);
+      
+      return canvas;
+    }
+    
+    function generateAllIcons() {
+      const preview = document.getElementById('iconPreview');
+      preview.innerHTML = '<h3 style="width: 100%">Generated Icons (Right-click to save):</h3>';
+      
+      sizes.forEach(size => {
+        const canvas = generateIcon(size);
+        const wrapper = document.createElement('div');
+        wrapper.style.textAlign = 'center';
+        
+        const label = document.createElement('div');
+        label.textContent = `${size}x${size}`;
+        label.style.marginTop = '5px';
+        label.style.fontSize = '12px';
+        
+        canvas.style.maxWidth = '150px';
+        canvas.style.height = 'auto';
+        canvas.id = `icon-${size}`;
+        
+        // Add download link
+        const downloadLink = document.createElement('a');
+        downloadLink.href = canvas.toDataURL('image/png');
+        downloadLink.download = `icon-${size}x${size}.png`;
+        downloadLink.style.display = 'block';
+        downloadLink.appendChild(canvas);
+        
+        wrapper.appendChild(downloadLink);
+        wrapper.appendChild(label);
+        preview.appendChild(wrapper);
+      });
+      
+      // Add download all button
+      const downloadAllBtn = document.createElement('button');
+      downloadAllBtn.textContent = '📥 Download All Icons';
+      downloadAllBtn.onclick = downloadAll;
+      downloadAllBtn.style.marginTop = '20px';
+      preview.appendChild(downloadAllBtn);
+    }
+    
+    function downloadAll() {
+      sizes.forEach((size, index) => {
+        setTimeout(() => {
+          const canvas = document.getElementById(`icon-${size}`);
+          if (canvas) {
+            const link = document.createElement('a');
+            link.download = `icon-${size}x${size}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+          }
+        }, index * 500); // Delay to avoid browser blocking multiple downloads
+      });
+      alert('Downloading icons... Check your downloads folder!');
+    }
+    
+    // Generate on load
+    window.onload = () => {
+      setTimeout(generateAllIcons, 500);
+    };
+  </script>
+</body>
+</html>
+
+

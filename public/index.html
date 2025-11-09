@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Professional stopwatch and timer with advanced analytics, session management, lap tracking, and multiple themes. Works offline as a PWA." />
+  <meta name="keywords" content="stopwatch, timer, lap timer, pomodoro, interval timer, sports timer, workout timer" />
+  <meta name="author" content="Professional Stopwatch App" />
+  
+  <!-- PWA Meta Tags -->
+  <meta name="theme-color" content="#2575fc" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Stopwatch" />
+  
+  <!-- Manifest -->
+  <link rel="manifest" href="manifest.json" />
+  
+  <!-- Icons -->
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192x192.png" />
+  <link rel="icon" type="image/png" sizes="512x512" href="icon-512x512.png" />
+  <link rel="apple-touch-icon" href="icon-192x192.png" />
+  
+  <title>⏱ Professional Stopwatch & Timer</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>⏱ Stopwatch & ⏳ Timer</h1>
+
+    <!-- Top Control Bar -->
+    <div class="top-controls">
+      <div class="top-buttons">
+        <button id="installBtn" onclick="installApp()" title="Install app to your device" style="display:none;">📱 Install App</button>
+        <button id="themeToggle" onclick="toggleTheme()" title="Toggle theme">🌙 Dark Mode</button>
+        <button onclick="toggleFullscreen()" title="Fullscreen (F key)">🖥️ Fullscreen</button>
+        <button onclick="openColorPicker()" title="Change accent color">🎨 Color</button>
+      </div>
+      
+      <div class="settings-toggles">
+        <label class="toggle-label">
+          <input type="checkbox" id="soundToggle" checked />
+          <span>🔊 Sound</span>
+        </label>
+        <label class="toggle-label">
+          <input type="checkbox" id="vibrateToggle" checked />
+          <span>📳 Vibrate</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Mode Switch -->
+    <div class="mode-switch">
+      <button id="stopwatchMode" class="active" onclick="setMode('stopwatch')">⏱ Stopwatch</button>
+      <button id="timerMode" onclick="setMode('timer')">⏳ Timer</button>
+    </div>
+
+    <!-- Multiple Stopwatch Tabs -->
+    <div id="stopwatchTabs" class="stopwatch-tabs"></div>
+
+    <!-- Display -->
+    <div id="display" class="display">00:00:00.00</div>
+
+    <!-- Timer Input -->
+    <div id="timer-inputs" class="timer-inputs" style="display: none;">
+      <input type="number" id="hoursInput" placeholder="HH" min="0" max="99" />
+      <span>:</span>
+      <input type="number" id="minutesInput" placeholder="MM" min="0" max="59" />
+      <span>:</span>
+      <input type="number" id="secondsInput" placeholder="SS" min="0" max="59" />
+    </div>
+
+    <!-- Sticky Controls -->
+    <div class="controls-sticky">
+      <div class="buttons">
+        <button class="btn-start" onclick="startStopwatchOrTimer()" title="Start (Space key)">▶️ Start</button>
+        <button class="btn-stop" onclick="stopStopwatchOrTimer()" title="Pause (Space key)">⏸ Pause</button>
+        <button class="btn-reset" onclick="resetStopwatchOrTimer()" title="Reset (R key)">🔄 Reset</button>
+        <button id="lapBtn" class="btn-lap" onclick="recordLap()" title="Lap (L key)">🏁 Lap</button>
+        <button id="exportBtn" class="btn-export" onclick="exportLaps()" title="Export as CSV">📥 Export CSV</button>
+        <button id="copyBtn" class="btn-copy" onclick="copyLaps()" title="Copy to clipboard">📋 Copy</button>
+      </div>
+    </div>
+
+    <!-- Keyboard Shortcuts Help -->
+    <div class="shortcuts-help">
+      ⌨️ Shortcuts: <kbd>Space</kbd> Start/Pause · <kbd>L</kbd> Lap · <kbd>R</kbd> Reset · <kbd>F</kbd> Fullscreen
+    </div>
+
+    <!-- Advanced Features Toolbar -->
+    <div class="advanced-toolbar" id="advancedToolbar">
+      <button onclick="toggleStats()" title="View lap statistics" class="tool-btn">📊 Stats</button>
+      <button onclick="toggleChart()" title="Visualize lap times" class="tool-btn">📈 Chart</button>
+      <button onclick="saveSession()" title="Save current session" class="tool-btn">💾 Save Session</button>
+      <button onclick="viewHistory()" title="View saved sessions" class="tool-btn">📜 History</button>
+      <button onclick="toggleThemePicker()" title="Choose theme preset" class="tool-btn">🎨 Themes</button>
+      <button onclick="togglePresets()" id="presetsBtn" title="Quick timer presets" class="tool-btn" style="display:none;">⏱️ Presets</button>
+    </div>
+
+    <!-- Statistics Panel -->
+    <div id="statsPanel" class="panel" style="display: none;">
+      <div class="panel-header">
+        <h3>📊 Lap Statistics</h3>
+        <button onclick="toggleStats()" class="close-btn">×</button>
+      </div>
+      <div id="statsContent" class="panel-content"></div>
+    </div>
+
+    <!-- Chart Panel -->
+    <div id="chartPanel" class="panel" style="display: none;">
+      <div class="panel-header">
+        <h3>📈 Lap Comparison Chart</h3>
+        <button onclick="toggleChart()" class="close-btn">×</button>
+      </div>
+      <div id="chartContainer" class="panel-content"></div>
+    </div>
+
+    <!-- History Panel -->
+    <div id="historyPanel" class="panel" style="display: none;">
+      <div class="panel-header">
+        <h3>📜 Session History</h3>
+        <button onclick="clearAllHistory()" class="clear-btn">Clear All</button>
+        <button onclick="viewHistory()" class="close-btn">×</button>
+      </div>
+      <div id="historyContent" class="panel-content history-content"></div>
+    </div>
+
+    <!-- Theme Picker Panel -->
+    <div id="themePickerPanel" class="panel" style="display: none;">
+      <div class="panel-header">
+        <h3>🎨 Theme Presets</h3>
+        <button onclick="toggleThemePicker()" class="close-btn">×</button>
+      </div>
+      <div class="panel-content theme-grid">
+        <button onclick="applyThemePreset('default')" class="theme-btn" style="background: linear-gradient(135deg, #2575fc, #6a11cb);">Default Blue</button>
+        <button onclick="applyThemePreset('ocean')" class="theme-btn" style="background: linear-gradient(135deg, #00b4d8, #0077b6);">Ocean</button>
+        <button onclick="applyThemePreset('forest')" class="theme-btn" style="background: linear-gradient(135deg, #52b788, #2d6a4f);">Forest</button>
+        <button onclick="applyThemePreset('sunset')" class="theme-btn" style="background: linear-gradient(135deg, #ff6b6b, #ee5a6f);">Sunset</button>
+        <button onclick="applyThemePreset('purple')" class="theme-btn" style="background: linear-gradient(135deg, #9d4edd, #7209b7);">Purple</button>
+        <button onclick="applyThemePreset('gold')" class="theme-btn" style="background: linear-gradient(135deg, #f77f00, #d62828);">Gold</button>
+        <button onclick="applyThemePreset('rose')" class="theme-btn" style="background: linear-gradient(135deg, #e63946, #f72585);">Rose</button>
+        <button onclick="applyThemePreset('mint')" class="theme-btn" style="background: linear-gradient(135deg, #06ffa5, #00d4aa);">Mint</button>
+        <button onclick="applyThemePreset('lavender')" class="theme-btn" style="background: linear-gradient(135deg, #b8a3d6, #9d84b7);">Lavender</button>
+      </div>
+    </div>
+
+    <!-- Timer Presets Panel -->
+    <div id="presetsPanel" class="panel" style="display: none;">
+      <div class="panel-header">
+        <h3>⏱️ Quick Timer Presets</h3>
+        <button onclick="togglePresets()" class="close-btn">×</button>
+      </div>
+      <div class="panel-content presets-grid">
+        <button onclick="setPresetTimer(60)" class="preset-btn">1 min</button>
+        <button onclick="setPresetTimer(180)" class="preset-btn">3 min</button>
+        <button onclick="setPresetTimer(300)" class="preset-btn">5 min</button>
+        <button onclick="setPresetTimer(600)" class="preset-btn">10 min</button>
+        <button onclick="setPresetTimer(900)" class="preset-btn">15 min</button>
+        <button onclick="setPresetTimer(1500)" class="preset-btn">25 min<br><small>(Pomodoro)</small></button>
+        <button onclick="setPresetTimer(1800)" class="preset-btn">30 min</button>
+        <button onclick="setPresetTimer(2700)" class="preset-btn">45 min</button>
+        <button onclick="setPresetTimer(3600)" class="preset-btn">1 hour</button>
+      </div>
+    </div>
+
+    <!-- Laps Display -->
+    <div id="laps" class="laps"></div>
+  </div>
+
+  <audio id="alarmSound" src="sounds/message.mp3" preload="auto"></audio>
+
+  <script src="script.js"></script>
+</body>
+</html>
